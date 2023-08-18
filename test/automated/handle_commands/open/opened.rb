@@ -5,15 +5,20 @@ context "Handle Commands" do
     context "Opened" do
       handler = Handlers::Commands.new
 
-      processed_time = Controls::Time::Processed::Raw.example
-
+      processed_time = Time.now
       handler.clock.now = processed_time
 
-      open = Controls::Commands::Open.example
+      open = Messages::Commands::Open.new
 
-      account_id = open.account_id or fail
-      customer_id = open.customer_id or fail
-      effective_time = open.time or fail
+      account_id = Identifier::UUID::Random.get
+      open.account_id = account_id
+
+      customer_id = Identifier::UUID::Random.get
+      open.customer_id = customer_id
+
+      effective_time = Time.now
+      effective_time_iso8601 = effective_time.iso8601
+      open.time = effective_time_iso8601
 
       handler.(open)
 
@@ -45,7 +50,7 @@ context "Handle Commands" do
         end
 
         test "time" do
-          assert(opened.time == effective_time)
+          assert(opened.time == effective_time_iso8601)
         end
 
         test "processed_time" do
